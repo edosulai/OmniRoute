@@ -47,6 +47,38 @@ export function buildGeminiThoughtSignatureKey(namespace: unknown, toolCallId: u
   return toolCallId;
 }
 
+/**
+ * Model family a thought signature belongs to: the upstream id without a provider
+ * prefix and without the reasoning-tier suffix (`-low`/`-high`/`-tiered`, …), since
+ * every tier of one model shares its signatures.
+ */
+export function thoughtSignatureModelFamily(model: unknown): string | null {
+  if (typeof model !== "string") return null;
+  const family = model
+    .trim()
+    .toLowerCase()
+    .replace(/^.*\//, "")
+    .replace(/-(minimal|low|medium|high|xhigh|max|tiered|thinking)$/, "");
+  return family.length > 0 ? family : null;
+}
+
+/**
+ * Signature namespace for one connection and model. A signature only validates on the
+ * model that minted it: a Claude signature replayed on a Gemini functionCall (or one
+ * Gemini model's on another) is rejected with 400 "Corrupted thought signature", and
+ * because signatures persist for 30 days the chat stays broken on that account. Keying
+ * by model makes a cross-model lookup miss, so the replay falls back to the bypass
+ * sentinel like any other signature-less tool call.
+ */
+export function buildGeminiThoughtSignatureNamespace(
+  connectionId: unknown,
+  model: unknown
+): string | null {
+  if (typeof connectionId !== "string" || connectionId.length === 0) return null;
+  const family = thoughtSignatureModelFamily(model);
+  return family ? `${connectionId}@${family}` : connectionId;
+}
+
 function pruneExpired() {
   const now = Date.now();
   for (const [key, value] of signatures.entries()) {

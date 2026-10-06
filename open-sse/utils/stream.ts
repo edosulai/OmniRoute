@@ -1,5 +1,6 @@
 import { translateResponse, initState } from "../translator/index.ts";
 import { FORMATS } from "../translator/formats.ts";
+import { buildGeminiThoughtSignatureNamespace } from "../services/geminiThoughtSignatureStore.ts";
 import { appendRequestLog } from "@/lib/usageDb";
 import { clearPendingRequestOnce } from "./pendingRequestCleanup.ts";
 import {
@@ -852,7 +853,7 @@ export function createSSEStream(options: StreamOptions = {}) {
           ...(initState(sourceFormat) as TranslateState),
           provider,
           toolNameMap,
-          signatureNamespace: connectionId,
+          signatureNamespace: buildGeminiThoughtSignatureNamespace(connectionId, model),
           copilotCompatibleReasoning,
           suppressThinkClose,
           requestedThinking,

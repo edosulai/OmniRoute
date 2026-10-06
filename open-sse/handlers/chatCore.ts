@@ -429,7 +429,10 @@ import {
   buildClaudeCodeCompatibleRequest,
   resolveClaudeCodeCompatibleSessionId,
 } from "../services/claudeCodeCompatible.ts";
-import { setGeminiThoughtSignatureMode } from "../services/geminiThoughtSignatureStore.ts";
+import {
+  buildGeminiThoughtSignatureNamespace,
+  setGeminiThoughtSignatureMode,
+} from "../services/geminiThoughtSignatureStore.ts";
 import {
   classifyModelScope429,
   getModelScopeRetryDelayMs,
@@ -2654,7 +2657,7 @@ async function handleChatCoreInner({
           normalizeToolCallId,
           preserveDeveloperRole,
           preserveCacheControl,
-          signatureNamespace: connectionId,
+          signatureNamespace: buildGeminiThoughtSignatureNamespace(connectionId, model),
           copilotClient: copilotCompatibleReasoning,
           reasoningCacheScope,
           videoTranscriptSensitive: videoBridgeObserved,
@@ -5297,7 +5300,7 @@ async function handleChatCoreInner({
                 sourceFormat
               ),
               preserveCacheControl,
-              signatureNamespace: connectionId,
+              signatureNamespace: buildGeminiThoughtSignatureNamespace(connectionId, model),
               copilotClient: copilotCompatibleReasoning,
               reasoningCacheScope,
               onReasoningReplayHistory: (messages) => {

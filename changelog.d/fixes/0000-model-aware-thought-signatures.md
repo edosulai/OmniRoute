@@ -1,0 +1,1 @@
+- **antigravity:** key cached thought signatures by connection and model family, so a chat that switches between Claude and Gemini (or between Gemini models) on one account no longer replays a foreign signature and fails every turn with 400 "Corrupted thought signature".
